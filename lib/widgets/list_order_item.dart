@@ -31,7 +31,7 @@ class _ListOrderItemState extends State<ListOrderItem> {
                   });
                 },
                 contentPadding: EdgeInsets.all(10),
-                title: Text('Rs. ${widget.orderItem.amount}'),
+                title: Text('Rs. ${widget.orderItem.amount.toStringAsFixed(2)}'),
                 subtitle: Text(DateFormat('dd/MM/yyyy hh:mm')
                     .format(widget.orderItem.dateTime)
                     .toString()),

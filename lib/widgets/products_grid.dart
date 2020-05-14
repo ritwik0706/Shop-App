@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/list_product_item.dart';
+import '../widgets/grid_product_item.dart';
 import '../models/providers/products.dart';
 
 class ProductsGrid extends StatelessWidget {
@@ -21,7 +21,7 @@ class ProductsGrid extends StatelessWidget {
       ),
       itemBuilder: (ctx, index) => ChangeNotifierProvider.value(
         value: productList[index],
-        child: ListProductItem(
+        child: GridProductItem(
           // productList[index].id,
           // productList[index].title,
           // productList[index].imageUrl,

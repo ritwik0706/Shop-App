@@ -20,7 +20,6 @@ class ListCartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build() called');
     return Dismissible(
       key: ValueKey(id),
       background: Container(

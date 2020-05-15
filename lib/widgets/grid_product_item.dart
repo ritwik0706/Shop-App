@@ -38,8 +38,14 @@ class GridProductItem extends StatelessWidget {
               icon: Icon(
                   product.isFavourite ? Icons.favorite : Icons.favorite_border),
               color: Theme.of(context).accentColor,
-              onPressed: () {
-                product.toggleFavouriteStatus();
+              onPressed: () async {
+                try {
+                  await product.toggleFavouriteStatus();
+                } catch (error) {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to add to fvourites.')),
+                  );
+                }
               },
             ),
           ),

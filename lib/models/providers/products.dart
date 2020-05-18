@@ -42,8 +42,9 @@ class Products with ChangeNotifier {
     // ),
   ];
   String authToken;
+  String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this._items, this.userId);
 
   List<Product> get items {
     return [..._items];
@@ -57,12 +58,20 @@ class Products with ChangeNotifier {
     return _items.firstWhere((element) => element.id == id);
   }
 
-  Future<void> fetchProducts() async {
-    final url = 'https://shop-app-62b25.firebaseio.com/products.json?auth=$authToken';
+  Future<void> fetchProducts([bool filter = false]) async {
+    String filterStr = '';
+    if(filter == true) {
+      filterStr = 'orderBy="createrId"&equalTo="$userId"';
+    }
+    String url = 'https://shop-app-62b25.firebaseio.com/products.json?auth=$authToken&$filterStr';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       if (extractedData == null) return;
+      url =
+        'https://shop-app-62b25.firebaseio.com/userFavourites/$userId.json?auth=$authToken';
+      final favresponse = await http.get(url);
+      final favData = json.decode(favresponse.body) as Map<String, dynamic>;
       final List<Product> loadedProduct = [];
       extractedData.forEach((key, value) {
         loadedProduct.add(Product(
@@ -71,7 +80,7 @@ class Products with ChangeNotifier {
           price: value['price'],
           description: value['description'],
           imageUrl: value['imageUrl'],
-          isFavourite: value['isFavourite'],
+          isFavourite: favData == null ? false : favData[key] == null ? false : favData[key],
         ));
       });
 
@@ -83,7 +92,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product prodItem) async {
-    const url = 'https://shop-app-62b25.firebaseio.com/products.json';
+    final url = 'https://shop-app-62b25.firebaseio.com/products.json?auth=$authToken';
     try {
       final res = await http.post(
         url,
@@ -92,7 +101,7 @@ class Products with ChangeNotifier {
           'price': prodItem.price,
           'description': prodItem.description,
           'imageUrl': prodItem.imageUrl,
-          'isFavourite': prodItem.isFavourite,
+          'createrId': userId,
         }),
       );
 
@@ -112,7 +121,7 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(String id, Product newProduct) async {
     final index = _items.indexWhere((element) => element.id == id);
     if (index >= 0) {
-      final url = 'https://shop-app-62b25.firebaseio.com/products/$id.json';
+      final url = 'https://shop-app-62b25.firebaseio.com/products/$id.json?auth=$authToken';
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -128,7 +137,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = 'https://shop-app-62b25.firebaseio.com/products/$id.json';
+    final url = 'https://shop-app-62b25.firebaseio.com/products/$id.json?auth=$authToken';
     final existingProductIndex = _items.indexWhere((e) => e.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);

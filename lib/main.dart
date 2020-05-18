@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './screens/splash_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/manage_products_screen.dart';
 import './screens/orders_screen.dart';
@@ -12,6 +13,7 @@ import './models/providers/products.dart';
 import './models/providers/cart.dart';
 import './models/providers/orders.dart';
 import './models/providers/auth.dart';
+import './helpers/custom_route.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,13 +28,22 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Auth(),
         ),
         ChangeNotifierProxyProvider<Auth, Products>(
-          create: (ctx) => Products(null, []),
-          update: (ctx, auth, previousProducts) => Products(auth.token,
-              previousProducts == null ? [] : previousProducts.items),
+          create: (ctx) => Products(null, [], null),
+          update: (ctx, auth, previousProducts) => Products(
+              auth.token,
+              previousProducts == null ? [] : previousProducts.items,
+              auth.userId),
         ),
-        // ChangeNotifierProvider(create: (ctx) => Products()),
         ChangeNotifierProvider(create: (ctx) => Cart()),
-        ChangeNotifierProvider(create: (ctx) => Orders()),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          create: (ctx) => Orders(null, null, []),
+          update: (ctx, auth, _previousOrder) => Orders(
+            auth.token,
+            auth.userId,
+            _previousOrder.orders,
+          ),
+        )
+        // ChangeNotifierProvider(create: (ctx) => Orders()),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, child) => MaterialApp(
@@ -44,8 +55,23 @@ class MyApp extends StatelessWidget {
             accentColor: Color.fromRGBO(249, 189, 8, 1),
             fontFamily: 'Lato',
             visualDensity: VisualDensity.adaptivePlatformDensity,
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              },
+            ),
           ),
-          home: auth.isAuth ? ProductOverviewScreen() : AuthScreen(),
+          home: auth.isAuth
+              ? ProductOverviewScreen()
+              : FutureBuilder(
+                  future: auth.tryAutologin(),
+                  builder: (ctx, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
+                ),
           routes: {
             ProductOverviewScreen.routeName: (ctx) => ProductOverviewScreen(),
             ProductDetailsScreen.routeName: (ctx) => ProductDetailsScreen(),

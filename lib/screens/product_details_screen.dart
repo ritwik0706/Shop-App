@@ -13,42 +13,64 @@ class ProductDetailsScreen extends StatelessWidget {
       listen: false,
     ).findById(productId);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loadedProduct.title),
-      ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            height: 300,
-            width: double.infinity,
-            child: Image.network(
-              loadedProduct.imageUrl,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Chip(
-            backgroundColor: Theme.of(context).accentColor,
-            label: Container(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    loadedProduct.title,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  Text(
-                    'Price : Rs. ${loadedProduct.price}',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
+      // appBar: AppBar(
+      //   title: Text(loadedProduct.title),
+      // ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 300,
+            elevation: 20,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(loadedProduct.title),
+              background: Hero(
+                tag: loadedProduct.id,
+                child: Image.network(
+                  loadedProduct.imageUrl,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
-          SizedBox(height: 10,),
-          Text(loadedProduct.description),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                SizedBox(
+                  height: 20  ,
+                ),
+                Chip(
+                  backgroundColor: Theme.of(context).accentColor,
+                  label: Container(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          loadedProduct.title,
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        Text(
+                          'Price : Rs. ${loadedProduct.price}',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  loadedProduct.description,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                ),
+                SizedBox(
+                  height: 480,
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );

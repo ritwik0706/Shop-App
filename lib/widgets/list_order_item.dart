@@ -31,7 +31,8 @@ class _ListOrderItemState extends State<ListOrderItem> {
                   });
                 },
                 contentPadding: EdgeInsets.all(10),
-                title: Text('Rs. ${widget.orderItem.amount.toStringAsFixed(2)}'),
+                title:
+                    Text('Rs. ${widget.orderItem.amount.toStringAsFixed(2)}'),
                 subtitle: Text(DateFormat('dd/MM/yyyy hh:mm')
                     .format(widget.orderItem.dateTime)
                     .toString()),
@@ -45,68 +46,71 @@ class _ListOrderItemState extends State<ListOrderItem> {
                 ),
               ),
             ),
-            if (_expanded)
-              Container(
-                height: min(max(100, widget.orderItem.products.length * 20.0), 150),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                    topLeft: Radius.circular(0),
-                    topRight: Radius.circular(0),
-                  ),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeIn,
+              height: _expanded
+                  ? min(max(100, widget.orderItem.products.length * 20.0), 150)
+                  : 0,
+              decoration: BoxDecoration(
+                color: Theme.of(context).accentColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                  topLeft: Radius.circular(0),
+                  topRight: Radius.circular(0),
                 ),
-                child: ListView(
-                  children: widget.orderItem.products
-                      .map(
-                        (product) => Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Column(
-                                  children: <Widget>[
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 0,
-                                        horizontal: 10,
-                                      ),
-                                      child: Text(
-                                        product.title,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15),
-                                      ),
+              ),
+              child: ListView(
+                children: widget.orderItem.products
+                    .map(
+                      (product) => Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 10,
                                     ),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 0,
-                                        horizontal: 10,
-                                      ),
-                                      child: Text(
-                                          '${product.quantity}x${product.price}'),
+                                    child: Text(
+                                      product.title,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15),
                                     ),
-                                  ],
-                                ),
-                                Container(
-                                  margin: EdgeInsets.symmetric(
-                                    vertical: 0,
-                                    horizontal: 10,
                                   ),
-                                  child:
-                                      Text('Rs.${product.quantity * product.price}'),
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 10,
+                                    ),
+                                    child: Text(
+                                        '${product.quantity}x${product.price}'),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical: 0,
+                                  horizontal: 10,
                                 ),
-                              ],
-                            ),
-                            Divider(),
-                          ],
-                        ),
-                      )
-                      .toList(),
-                ),
-              )
+                                child: Text(
+                                    'Rs.${product.quantity * product.price}'),
+                              ),
+                            ],
+                          ),
+                          Divider(),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            )
           ],
         ),
       ),

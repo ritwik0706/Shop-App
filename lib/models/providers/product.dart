@@ -27,20 +27,21 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> toggleFavouriteStatus() async {
-    final url = 'https://shop-app-62b25.firebaseio.com/products/$id.json';
+  Future<void> toggleFavouriteStatus(String token, String userId) async {
+    final url =
+        'https://shop-app-62b25.firebaseio.com/userFavourites/$userId/$id.json?auth=$token';
     _updateFav();
     try {
-      final response = await http.patch(
+      final response = await http.put(
         url,
-        body: json.encode({
-          'isFavourite': isFavourite,
-        }),
+        body: json.encode(
+          isFavourite,
+        ),
       );
 
       if (response.statusCode >= 400) {
         _updateFav();
-        throw HttpException('Error Deleting Product');
+        throw HttpException('Error Updating Fav Status');
       }
     } catch (error) {
       _updateFav();

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/product_details_screen.dart';
 import '../models/providers/product.dart';
 import '../models/providers/cart.dart';
+import '../models/providers/auth.dart';
 
 class GridProductItem extends StatelessWidget {
   // final String id;
@@ -14,19 +15,23 @@ class GridProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
       child: GridTile(
         child: GestureDetector(
-          onTap: () => Navigator.of(context).pushNamed(
-            ProductDetailsScreen.routeName,
-            arguments: product.id,
-          ),
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
-          ),
-        ),
+            onTap: () => Navigator.of(context).pushNamed(
+                  ProductDetailsScreen.routeName,
+                  arguments: product.id,
+                ),
+            child: Hero(
+              tag: product.id,
+                          child: FadeInImage(
+                placeholder: AssetImage('assets/images/product-placeholder.jpg'),
+                image: NetworkImage(product.imageUrl),
+                fit: BoxFit.cover,
+              ),
+            )),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
           title: Text(
@@ -40,7 +45,8 @@ class GridProductItem extends StatelessWidget {
               color: Theme.of(context).accentColor,
               onPressed: () async {
                 try {
-                  await product.toggleFavouriteStatus();
+                  await product.toggleFavouriteStatus(
+                      authData.token, authData.userId);
                 } catch (error) {
                   Scaffold.of(context).showSnackBar(
                     SnackBar(content: Text('Failed to add to fvourites.')),
